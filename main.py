@@ -18,6 +18,16 @@ def openFile():
     return d
 
 
+def initFlowersList(data):
+    fList = []
+    i = 0
+    for line in range(len(data)):
+        f = Flower.Flower(data.loc[line, 'x'], data.loc[line, 'y'], i)
+        fList.append(f)
+        i += 1
+    return fList
+
+
 def getFlowerById(flowList, index):
     for flower in flowList:
         if flower.getIndex() == index:
@@ -106,13 +116,7 @@ data = openFile()
 if len(data) == 0:
     print("File is empty or does not exist, please place flowers.xlsx in resources directory.")
     quit()
-
-flowersList = []
-i = 0
-for line in range(len(data)):
-    f = Flower.Flower(data.loc[line, 'x'], data.loc[line, 'y'], i)
-    flowersList.append(f)
-    i += 1
+flowersList = initFlowersList(data)
 
 firstPopulation = []
 firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT)  # 1 )
