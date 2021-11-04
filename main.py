@@ -9,6 +9,7 @@ GENERATION_COUNT_MAX = 100
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 
+
 def openFile():
     try:
         d = pd.read_excel('./resources/flowers.xlsx')
@@ -23,21 +24,18 @@ def getFlowerById(flowList, index):
             return flower
 
 
-def generatePopulation(flowList):
-    population = []
-    for pop in range(POPULATION_COUNT):
+def generatePopulation(population, flowList, count):
+    for pop in range(count):
         individual = Path.Path()
         indexList = random.sample(range(len(flowList)), len(flowList))
         for index in indexList:
             individual.addFlower(getFlowerById(flowList, index))
+        individual.calculateLength()
         population.append(individual)
     return population
 
 
 def fitness(population):
-    for individual in population:
-        individual.calculateLength()
-        individual.printFitness()
     fitnesses = {}
     i = 0
     for individual in population:
@@ -53,42 +51,33 @@ def sortFitnesses(fitnesses):
 
 def sortPopulation(fitnesses, population):
     sortedPopulation = []
-    print(fitnesses)
     for key in fitnesses.keys():
         sortedPopulation.append(population[int(key)])
-
-    print("\nPopulation")
-    for indiv in population:
-        indiv.printFitness()
-
-    print("\nSorted Population")
-    for indiv in sortedPopulation:
-        indiv.printFitness()
     population = sortedPopulation
     return population
 
 
+def crossing(first_half, last_half, half):
+    cross = Path.Path()
+    for i in range(half):
+        cross.addFlower(first_half[i])
+    for i in range(half, FLOWERS_NUMBER):
+        cross.addFlower(last_half[i])
+    cross.calculateLength()
+    return cross
+
+
 def crossover(newGeneration, first_best, second_best, third_best):
     half = int(FLOWERS_NUMBER / 2) - 1
-    first_order  = first_best.getOrder()
+    first_order = first_best.getOrder()
     second_order = second_best.getOrder()
-    third_order  = third_best.getOrder()
-
-    # first_best  first half and  second_best last half
-    cross0 = Path.Path()
-    for i in range(half):
-        cross0.addFlower()
-
-    for i in range(half, FLOWERS_NUMBER):
-        cross0.addFlower()
-
-    # first_best  first half and  third_best last half
-
-    # second_best first half and  first_best last half
-    # second_best first half and  third_best last half
-
-    # third_best  first half and  first_best last half
-    # third_best  first half and  second_best last half
+    third_order = third_best.getOrder()
+    newGeneration.append(crossing(first_order, second_order, half))
+    newGeneration.append(crossing(first_order, third_order, half))
+    newGeneration.append(crossing(second_order, first_order, half))
+    newGeneration.append(crossing(second_order, third_order, half))
+    newGeneration.append(crossing(third_order, first_order, half))
+    newGeneration.append(crossing(third_order, second_order, half))
     return newGeneration
 
 
@@ -110,9 +99,10 @@ for line in range(len(data)):
     flowersList.append(f)
     i += 1
 
-firstPopulation = generatePopulation(flowersList)               # 1 )
+firstPopulation = []
+firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT)  # 1 )
 
-fitnessDic = fitness(firstPopulation)                           # 2 )
+fitnessDic = fitness(firstPopulation)  # 2 )
 fitnessDic = sortFitnesses(fitnessDic)
 firstPopulation = sortPopulation(fitnessDic, firstPopulation)
 
@@ -120,10 +110,11 @@ newGeneration = []
 first_best = firstPopulation[0]
 second_best = firstPopulation[1]
 third_best = firstPopulation[2]
-newGeneration.append(first_best)                                # 3 )
+newGeneration.append(first_best)  # 3 )
 
-newGeneration = crossover(newGeneration, first_best, second_best, third_best)   # 4 )
-printPopulation(newGeneration)
+newGeneration = crossover(newGeneration, first_best, second_best, third_best)  # 4 )
+newGeneration = generatePopulation(newGeneration, flowersList, POPULATION_COUNT - len(newGeneration))  # 5 )
+
 
 
 """ Incidence Matrix 

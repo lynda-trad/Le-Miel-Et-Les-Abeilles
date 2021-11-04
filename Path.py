@@ -25,7 +25,7 @@ class Path:
         self.order.append(flower)
 
     def printPath(self):
-        print("Path:")
+        print("\nPath:")
         for flower in self.order:
             flower.printFlower()
 
