@@ -7,7 +7,6 @@ def distanceCalculus(coord1, coord2):
     x2 = coord2[0]
     y2 = coord2[1]
     distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-    print("Distance between ", x1, ", ", y1, "and ", x2, ", ", y2, ": ", distance)
     return distance
 
 
@@ -19,9 +18,18 @@ class Path:
     def getLength(self):
         return self.length
 
+    def getOrder(self):
+        return self.order
+
     def addFlower(self, flower):
         self.order.append(flower)
 
+    def printPath(self):
+        print("Path:")
+        for flower in self.order:
+            flower.printFlower()
+
+    # Fitness
     def calculateLength(self):
         total = 0
         starting_point = (500, 500)
@@ -30,10 +38,7 @@ class Path:
         for i in range(len(self.order)):
             if i != len(self.order) - 1:
                 total += distanceCalculus(self.order[i].getCoordinates(), self.order[i + 1].getCoordinates())
-
         self.length = total
 
-    def printPath(self):
-        print("Path:")
-        for flower in self.order:
-            flower.printFlower()
+    def printFitness(self):
+        print("Fitness : ", self.getLength())
