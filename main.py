@@ -111,6 +111,38 @@ def mutation(population):
     return population
 
 
+def cycle():
+    # First generation
+    i = 1
+    firstPopulation = []
+    firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT - len(firstPopulation))  # 1 )
+    fitnessDic = fitness(firstPopulation)  # 2 )
+    fitnessDic = sortFitnesses(fitnessDic)
+    firstPopulation = sortPopulation(fitnessDic, firstPopulation)
+
+    # New generation
+    i += 1
+    while i != GENERATION_COUNT_MAX:
+        previousGen = firstPopulation
+        newGeneration = []
+        first_best = previousGen[0]
+        second_best = previousGen[1]
+        third_best = previousGen[2]
+        newGeneration.append(first_best)  # 3 )
+
+        newGeneration = crossover(newGeneration, first_best, second_best, third_best)  # 4 )
+        newGeneration = generatePopulation(newGeneration, flowersList, POPULATION_COUNT - len(newGeneration))  # 5 )
+
+        newGeneration = mutation(newGeneration)  # 6 )
+
+        new_fitnessDic = fitness(newGeneration)  # 2 )
+        new_fitnessDic = sortFitnesses(new_fitnessDic)
+        newGeneration = sortPopulation(new_fitnessDic, newGeneration)
+
+        i += 1
+    return newGeneration[0]  # best path
+
+
 ##################################################
 data = openFile()
 if len(data) == 0:
@@ -118,23 +150,32 @@ if len(data) == 0:
     quit()
 flowersList = initFlowersList(data)
 
+# First generation
 firstPopulation = []
-firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT)  # 1 )
+firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT - len(firstPopulation))  # 1 )
 
 fitnessDic = fitness(firstPopulation)  # 2 )
 fitnessDic = sortFitnesses(fitnessDic)
 firstPopulation = sortPopulation(fitnessDic, firstPopulation)
 
+# New generation
+previousGen = firstPopulation
 newGeneration = []
-first_best = firstPopulation[0]
-second_best = firstPopulation[1]
-third_best = firstPopulation[2]
+first_best = previousGen[0]
+second_best = previousGen[1]
+third_best = previousGen[2]
 newGeneration.append(first_best)  # 3 )
 
 newGeneration = crossover(newGeneration, first_best, second_best, third_best)  # 4 )
 newGeneration = generatePopulation(newGeneration, flowersList, POPULATION_COUNT - len(newGeneration))  # 5 )
 
 newGeneration = mutation(newGeneration)  # 6 )
+
+new_fitnessDic = fitness(newGeneration)  # 2 )
+new_fitnessDic = sortFitnesses(new_fitnessDic)
+newGeneration = sortPopulation(new_fitnessDic, newGeneration)
+
+
 
 """ Incidence Matrix 
 # chemin hamiltonien minimal
