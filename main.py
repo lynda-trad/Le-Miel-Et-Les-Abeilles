@@ -39,6 +39,7 @@ def fitness(population):
     fitnesses = {}
     i = 0
     for individual in population:
+        individual.calculateLength()
         fitnesses[i] = individual.getLength()
         i += 1
     return fitnesses
@@ -67,23 +68,37 @@ def crossing(first_half, last_half, half):
     return cross
 
 
-def crossover(newGeneration, first_best, second_best, third_best):
+def crossover(population, first_best, second_best, third_best):
     half = int(FLOWERS_NUMBER / 2) - 1
     first_order = first_best.getOrder()
     second_order = second_best.getOrder()
     third_order = third_best.getOrder()
-    newGeneration.append(crossing(first_order, second_order, half))
-    newGeneration.append(crossing(first_order, third_order, half))
-    newGeneration.append(crossing(second_order, first_order, half))
-    newGeneration.append(crossing(second_order, third_order, half))
-    newGeneration.append(crossing(third_order, first_order, half))
-    newGeneration.append(crossing(third_order, second_order, half))
-    return newGeneration
+    population.append(crossing(first_order, second_order, half))
+    population.append(crossing(first_order, third_order, half))
+    population.append(crossing(second_order, first_order, half))
+    population.append(crossing(second_order, third_order, half))
+    population.append(crossing(third_order, first_order, half))
+    population.append(crossing(third_order, second_order, half))
+    return population
 
 
 def printPopulation(population):
     for individual in population:
         individual.printFitness()
+
+
+# 2 flowers switch places in every path of the population
+def mutation(population):
+    for individual in population:
+        pos = random.randint(0, len(population) - 1)
+        path = individual.getOrder()
+        first = path[pos]
+        second = path[pos + 1]
+        path.pop(pos)
+        path.pop(pos + 1)
+        path.insert(pos, second)
+        path.insert(pos + 1, first)
+    return population
 
 
 ##################################################
@@ -115,7 +130,7 @@ newGeneration.append(first_best)  # 3 )
 newGeneration = crossover(newGeneration, first_best, second_best, third_best)  # 4 )
 newGeneration = generatePopulation(newGeneration, flowersList, POPULATION_COUNT - len(newGeneration))  # 5 )
 
-
+newGeneration = mutation(newGeneration)  # 6 )
 
 """ Incidence Matrix 
 # chemin hamiltonien minimal
@@ -138,5 +153,4 @@ for f1 in flowersList:
 7 ) start again from 2
 8 ) continue for 100 tries and look if its good enough
 9 ) how do we know its good enough ? new generation can be worse than the previous one...   
-
 """
