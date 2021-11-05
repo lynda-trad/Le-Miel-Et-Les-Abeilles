@@ -22,6 +22,9 @@ class Path:
     def getOrder(self):
         return self.order
 
+    def setOrder(self, fList):
+        self.order = fList
+
     # Adds flower object to order list
     def addFlower(self, flower):
         self.order.append(flower)

@@ -81,13 +81,18 @@ def crossover(population, bestL):
     for i in range(len(bestL) - 1):
         for j in range(len(bestL) - 1):  # each best will reproduce with another best twice
             if i != j:
-                population.append(crossing(orders[i], orders[j], half))
+                cross = Path.Path()
+                fList = list(set(orders[i] + orders[j]))
+                cross.setOrder(fList)
+                population.append(cross)
+                cross.printPath()
+                # population.append(crossing(orders[i], orders[j], half))
     return population
 
 
 # 2 flowers switch places in every path of the population
 def mutation(population):
-    for i in range(19, POPULATION_COUNT - 1):
+    for i in range(20, POPULATION_COUNT - 2):
         individual = population[i]
         pos1 = random.randint(0, FLOWERS_NUMBER - 2)
         pos2 = random.randint(0, FLOWERS_NUMBER - 2)
@@ -134,7 +139,7 @@ def generateFirstGeneration(fList):
 
 
 # Generates a new generation with previous one
-def generateNewGeneration(previous, new):
+def generateNewGeneration(previous):
     new = previous
     bestList = []
     for i in range(20):
@@ -161,10 +166,10 @@ def cycle(fList):
     previousGen = firstPopulation
     newGeneration = []
     # printPopulation(previousGen, 1)
-    previousGen[0].printPath()
+
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
-        newGeneration = generateNewGeneration(previousGen, newGeneration)
+        newGeneration = generateNewGeneration(previousGen)
         # printPopulation(newGeneration, i)
         if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
