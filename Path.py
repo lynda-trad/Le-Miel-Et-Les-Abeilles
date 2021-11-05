@@ -6,8 +6,7 @@ def distanceCalculus(coord1, coord2):
     y1 = coord1[1]
     x2 = coord2[0]
     y2 = coord2[1]
-    distance = (x2 - x1) ** 2 + (y2 - y1) ** 2
-    # math.sqrt()
+    distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
     return int(distance)
 
 
