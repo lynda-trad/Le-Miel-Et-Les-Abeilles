@@ -1,6 +1,7 @@
 import math
 
 
+# Calculates distance between two points
 def distanceCalculus(coord1, coord2):
     x1 = coord1[0]
     y1 = coord1[1]
@@ -21,16 +22,21 @@ class Path:
     def getOrder(self):
         return self.order
 
+    # Adds flower object to order list
     def addFlower(self, flower):
         self.order.append(flower)
 
+    # Printing methods
     def printPath(self):
         print("\nPath:")
         for flower in self.order:
             flower.printFlower()
         self.printFitness()
 
-    # Fitness
+    def printFitness(self):
+        print("Fitness : ", self.getLength())
+
+    # Calculates fitness
     def calculateLength(self):
         total = 0
         starting_point = (500, 500)
@@ -40,6 +46,3 @@ class Path:
             if i != len(self.order) - 1:
                 total += distanceCalculus(self.order[i].getCoordinates(), self.order[i + 1].getCoordinates())
         self.length = total
-
-    def printFitness(self):
-        print("Fitness : ", self.getLength())

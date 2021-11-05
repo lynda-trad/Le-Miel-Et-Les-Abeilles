@@ -1,11 +1,10 @@
 import pandas as pd
-import numpy as np
 import random
 import Flower
 import Path
 
 POPULATION_COUNT = 100
-GENERATION_COUNT_MAX = 100
+GENERATION_COUNT_MAX = 500
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 
@@ -80,7 +79,9 @@ def crossover(population, bestL):
     for best in bestL:
         orders.append(best.getOrder())
     for i in range(len(bestL) - 1):
-        population.append(crossing(orders[i], orders[i + 1], half))
+        for j in range(len(bestL) - 1):  # each best will reproduce with another best twice
+            if i != j:
+                population.append(crossing(orders[i], orders[j], half))
     return population
 
 
@@ -160,11 +161,11 @@ def cycle(fList):
     previousGen = firstPopulation
     newGeneration = []
     # printPopulation(previousGen, 1)
-
+    previousGen[0].printPath()
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
         newGeneration = generateNewGeneration(previousGen, newGeneration)
-        printPopulation(newGeneration, i)
+        # printPopulation(newGeneration, i)
         if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
             newGeneration = []
@@ -183,33 +184,10 @@ if len(data) == 0:
     print("File is empty or does not exist, please place flowers.xlsx in resources directory.")
     quit()
 flowersList = initFlowersList(data)
-
+print("-- GENERATIONS --\nBe patient !")
 last_generation = cycle(flowersList)
 best_path = last_generation[0]
+printPopulation(last_generation, GENERATION_COUNT_MAX)
 print("\nBEST PATH OF LAST GENERATION : ")
-best_path.printFitness()
+best_path.printPath()
 print("LENGTH", len(last_generation))
-
-"""
-New AG : 
-FIRST GENERATION : start with POPULATION_COUNT = 100 random paths
-Calculate fitness and sort the population by shortest path
-
-NEW GENERATIONS :
-1 ) append all from previous gen
-2 ) 80 last will have mutations
-3 ) first 20 from previous best will generate children
-- we end up with 120 individuals so we have to :
-4 ) sort the population
-5 ) last 20 are the worst, we remove them to end up with POPULATION_COUNT = 100 individuals
-
-Previous AG :
-1 ) take first best from previous gen and add it to new generation
-2 ) cross over first 3 of previous gen, half from first, half from second -> new generation has 6 members
-3 ) add (POPULATION_COUNT - new gen length) new members by generating them randomly
-4 ) add mutation to genes -> 2 flowers will be switched in [ every path or just the cross overs ? ] 
-5 ) calculate fitness
-6 ) sort by shortest path
-
-repeat new generations for 100 tries and look if its good enough 
-"""

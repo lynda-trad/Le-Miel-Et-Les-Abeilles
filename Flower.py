@@ -3,16 +3,12 @@ class Flower:
         self.x = x
         self.y = y
         self.index = index
-        self.visited = False
-
-    def setVisited(self, visited):
-        self.visited = visited
-
-    def printFlower(self):
-        print("\nFlower:", "\nx:", self.x, "\ny:", self.y, "\nIndex:", self.index, "\nvisited:", self.visited)
 
     def getCoordinates(self):
         return self.x, self.y
 
     def getIndex(self):
         return self.index
+
+    def printFlower(self):
+        print("\nFlower", self.index, ": (", self.x, ",", self.y, ")")
