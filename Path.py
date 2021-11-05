@@ -7,7 +7,7 @@ def distanceCalculus(coord1, coord2):
     x2 = coord2[0]
     y2 = coord2[1]
     distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-    return distance
+    return int(distance)
 
 
 class Path:
@@ -28,6 +28,7 @@ class Path:
         print("\nPath:")
         for flower in self.order:
             flower.printFlower()
+        self.printFitness()
 
     # Fitness
     def calculateLength(self):

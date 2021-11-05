@@ -111,20 +111,23 @@ def mutation(population):
     return population
 
 
-def cycle():
+def cycle(fList):
     # First generation
     i = 1
     firstPopulation = []
-    firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT - len(firstPopulation))  # 1 )
+    firstPopulation = generatePopulation(firstPopulation, fList, POPULATION_COUNT - len(firstPopulation))  # 1 )
     fitnessDic = fitness(firstPopulation)  # 2 )
     fitnessDic = sortFitnesses(fitnessDic)
     firstPopulation = sortPopulation(fitnessDic, firstPopulation)
 
+    previousGen = firstPopulation
+    newGeneration = []
+    print("Generation 1")
+    for path in previousGen:
+        path.printFitness()
+
     # New generation
-    i += 1
-    while i != GENERATION_COUNT_MAX:
-        previousGen = firstPopulation
-        newGeneration = []
+    for i in range(2, GENERATION_COUNT_MAX + 1):
         first_best = previousGen[0]
         second_best = previousGen[1]
         third_best = previousGen[2]
@@ -139,8 +142,15 @@ def cycle():
         new_fitnessDic = sortFitnesses(new_fitnessDic)
         newGeneration = sortPopulation(new_fitnessDic, newGeneration)
 
-        i += 1
-    return newGeneration[0]  # best path
+        # Printing
+        print("Generation", i)
+        for path in newGeneration:
+            path.printFitness()
+
+        if i != GENERATION_COUNT_MAX - 1:
+            previousGen = newGeneration
+            newGeneration = []
+    return newGeneration  # last generation
 
 
 ##################################################
@@ -150,52 +160,20 @@ if len(data) == 0:
     quit()
 flowersList = initFlowersList(data)
 
-# First generation
-firstPopulation = []
-firstPopulation = generatePopulation(firstPopulation, flowersList, POPULATION_COUNT - len(firstPopulation))  # 1 )
-
-fitnessDic = fitness(firstPopulation)  # 2 )
-fitnessDic = sortFitnesses(fitnessDic)
-firstPopulation = sortPopulation(fitnessDic, firstPopulation)
-
-# New generation
-previousGen = firstPopulation
-newGeneration = []
-first_best = previousGen[0]
-second_best = previousGen[1]
-third_best = previousGen[2]
-newGeneration.append(first_best)  # 3 )
-
-newGeneration = crossover(newGeneration, first_best, second_best, third_best)  # 4 )
-newGeneration = generatePopulation(newGeneration, flowersList, POPULATION_COUNT - len(newGeneration))  # 5 )
-
-newGeneration = mutation(newGeneration)  # 6 )
-
-new_fitnessDic = fitness(newGeneration)  # 2 )
-new_fitnessDic = sortFitnesses(new_fitnessDic)
-newGeneration = sortPopulation(new_fitnessDic, newGeneration)
-
-
-
-""" Incidence Matrix 
-# chemin hamiltonien minimal
-# Permutation encoding ? Chromosome == order of flowers ?
-matrix = np.zeros((len(data), len(data)))
-for f1 in flowersList:
-    for f2 in flowersList:
-        matrix[f1.getIndex(), f2.getIndex()] = Path.distanceCalculus(f1.getCoordinates(), f2.getCoordinates())
-"""
+last_generation = cycle(flowersList)
+best_path = last_generation[0]      # or is it ? 
 
 """
-    individual = random path
-    gene == flower
-1 ) generate population -> start with 10 random paths
-2 ) calculate fitness and sort the population by shortest path
-3 ) takes first best from the list and add it to new generation
-4 ) cross over first 3, half from first, half from second -> new generation has 6 members
-5 ) add 10 - new gen length new members by generating them randomly
-6 ) add mutation to genes -> 2 flowers will be switched in every path
-7 ) start again from 2
-8 ) continue for 100 tries and look if its good enough
-9 ) how do we know its good enough ? new generation can be worse than the previous one...   
+FIRST GENERATION : start with POPULATION_COUNT random paths
+Calculate fitness and sort the population by shortest path
+
+NEW GENERATIONS :
+1 ) take first best from previous gen and add it to new generation
+2 ) cross over first 3 of previous gen, half from first, half from second -> new generation has 6 members
+3 ) add (POPULATION_COUNT - new gen length) new members by generating them randomly
+4 ) add mutation to genes -> 2 flowers will be switched in [ every path or just the cross overs ? ] 
+5 ) calculate fitness
+6 ) sort by shortest path
+
+repeat new generations for 100 tries and look if its good enough 
 """
