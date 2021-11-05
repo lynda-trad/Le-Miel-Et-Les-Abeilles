@@ -4,12 +4,13 @@ import random
 import Flower
 import Path
 
-POPULATION_COUNT = 10
+POPULATION_COUNT = 100
 GENERATION_COUNT_MAX = 100
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 
 
+# Opens excel file and returns dataframe
 def openFile():
     try:
         d = pd.read_excel('./resources/flowers.xlsx')
@@ -18,33 +19,25 @@ def openFile():
     return d
 
 
-def initFlowersList(data):
+# Returns flower list by parsing dataframe
+def initFlowersList(d):
     fList = []
     i = 0
-    for line in range(len(data)):
-        f = Flower.Flower(data.loc[line, 'x'], data.loc[line, 'y'], i)
+    for line in range(len(d)):
+        f = Flower.Flower(d.loc[line, 'x'], d.loc[line, 'y'], i)
         fList.append(f)
         i += 1
     return fList
 
 
+# Returns flower when given its ID
 def getFlowerById(flowList, index):
     for flower in flowList:
         if flower.getIndex() == index:
             return flower
 
 
-def generatePopulation(population, flowList, count):
-    for pop in range(count):
-        individual = Path.Path()
-        indexList = random.sample(range(len(flowList)), len(flowList))
-        for index in indexList:
-            individual.addFlower(getFlowerById(flowList, index))
-        individual.calculateLength()
-        population.append(individual)
-    return population
-
-
+# Returns list of individuals' fitness in a population
 def fitness(population):
     fitnesses = {}
     i = 0
@@ -55,11 +48,13 @@ def fitness(population):
     return fitnesses
 
 
+# Sorts fitness list by shortest
 def sortFitnesses(fitnesses):
     fitList = sorted(fitnesses.items(), key=lambda x: x[1])
     return dict(fitList)
 
 
+# Sorts population by shortest fitness
 def sortPopulation(fitnesses, population):
     sortedPopulation = []
     for key in fitnesses.keys():
@@ -68,6 +63,7 @@ def sortPopulation(fitnesses, population):
     return population
 
 
+# Crosses first half and last half of two genomes ; returns new genome
 def crossing(first_half, last_half, half):
     cross = Path.Path()
     for i in range(half):
@@ -92,62 +88,80 @@ def crossover(population, first_best, second_best, third_best):
     return population
 
 
-def printPopulation(population):
+def printPopulation(population, i):
+    print("\nGeneration", i)
     for individual in population:
         individual.printFitness()
 
 
 # 2 flowers switch places in every path of the population
 def mutation(population):
-    for individual in population:
-        pos = random.randint(0, len(population) - 1)
+    for i in range(19, POPULATION_COUNT - 1):
+        individual = population[i]
+        pos1 = random.randint(0, FLOWERS_NUMBER - 1)
+        pos2 = 0
+        while pos2 == pos1:
+            pos2 = random.randint(0, FLOWERS_NUMBER - 1)
         path = individual.getOrder()
-        first = path[pos]
-        second = path[pos + 1]
-        path.pop(pos)
-        path.pop(pos + 1)
-        path.insert(pos, second)
-        path.insert(pos + 1, first)
+        first = path[pos1]
+        second = path[pos2]
+        path.pop(pos1)
+        path.pop(pos2)
+        path.insert(pos1, second)
+        path.insert(pos2, first)
     return population
 
 
+# Generates individuals in a population
+def generatePopulation(population, flowList, count):
+    for pop in range(count):
+        individual = Path.Path()
+        indexList = random.sample(range(len(flowList)), len(flowList))
+        for index in indexList:
+            individual.addFlower(getFlowerById(flowList, index))
+        individual.calculateLength()
+        population.append(individual)
+    return population
+
+
+# Generates first generation
+def generateFirstGeneration(fList):
+    first = []
+    first = generatePopulation(first, fList, POPULATION_COUNT - len(first))  # 1 )
+    fitnessDic = fitness(first)  # 2 )
+    fitnessDic = sortFitnesses(fitnessDic)
+    first = sortPopulation(fitnessDic, first)
+    return first
+
+
+# Generates a new generation with previous one
+def generateNewGeneration(previous, new):
+    first_best = previous[0]
+    second_best = previous[1]
+    third_best = previous[2]
+    new.append(first_best)  # 3 )
+    new = crossover(new, first_best, second_best, third_best)  # 4 )
+    new = generatePopulation(new, flowersList, POPULATION_COUNT - len(new))  # 5 )
+    new = mutation(new)  # 6 )
+    new_fitnessDic = fitness(new)  # 2 )
+    new_fitnessDic = sortFitnesses(new_fitnessDic)
+    new = sortPopulation(new_fitnessDic, new)
+    return new
+
+
+# Generates GENERATION_COUNT_MAX generations and returns the last one
 def cycle(fList):
     # First generation
-    i = 1
-    firstPopulation = []
-    firstPopulation = generatePopulation(firstPopulation, fList, POPULATION_COUNT - len(firstPopulation))  # 1 )
-    fitnessDic = fitness(firstPopulation)  # 2 )
-    fitnessDic = sortFitnesses(fitnessDic)
-    firstPopulation = sortPopulation(fitnessDic, firstPopulation)
-
+    firstPopulation = generateFirstGeneration(fList)
     previousGen = firstPopulation
     newGeneration = []
-    print("Generation 1")
-    for path in previousGen:
-        path.printFitness()
+    # printPopulation(previousGen, 1)
 
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
-        first_best = previousGen[0]
-        second_best = previousGen[1]
-        third_best = previousGen[2]
-        newGeneration.append(first_best)  # 3 )
-
-        newGeneration = crossover(newGeneration, first_best, second_best, third_best)  # 4 )
-        newGeneration = generatePopulation(newGeneration, flowersList, POPULATION_COUNT - len(newGeneration))  # 5 )
-
-        newGeneration = mutation(newGeneration)  # 6 )
-
-        new_fitnessDic = fitness(newGeneration)  # 2 )
-        new_fitnessDic = sortFitnesses(new_fitnessDic)
-        newGeneration = sortPopulation(new_fitnessDic, newGeneration)
-
-        # Printing
-        print("Generation", i)
-        for path in newGeneration:
-            path.printFitness()
-
-        if i != GENERATION_COUNT_MAX - 1:
+        newGeneration = generateNewGeneration(previousGen, newGeneration)
+        # printPopulation(newGeneration, i)
+        if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
             newGeneration = []
     return newGeneration  # last generation
@@ -161,13 +175,25 @@ if len(data) == 0:
 flowersList = initFlowersList(data)
 
 last_generation = cycle(flowersList)
-best_path = last_generation[0]      # or is it ? 
+best_path = last_generation[0]  # or is it ?
+printPopulation(last_generation, GENERATION_COUNT_MAX)
+print("\nBEST PATH OF LAST GENERATION : ")
+best_path.printPath()
 
 """
-FIRST GENERATION : start with POPULATION_COUNT random paths
+New AG : 
+FIRST GENERATION : start with POPULATION_COUNT = 100 random paths
 Calculate fitness and sort the population by shortest path
 
 NEW GENERATIONS :
+1 ) append all from previous gen
+2 ) 80 last will have mutations
+3 ) first 20 from previous best will generate children
+- we end up with 120 individuals so we have to :
+4 ) sort the population
+5 ) last 20 are the worst, we remove them to end up with POPULATION_COUNT = 100 individuals
+
+Previous AG :
 1 ) take first best from previous gen and add it to new generation
 2 ) cross over first 3 of previous gen, half from first, half from second -> new generation has 6 members
 3 ) add (POPULATION_COUNT - new gen length) new members by generating them randomly
