@@ -88,10 +88,10 @@ def crossover(population, bestL):
 def mutation(population):
     for i in range(19, POPULATION_COUNT - 1):
         individual = population[i]
-        pos1 = random.randint(0, FLOWERS_NUMBER - 1)
-        pos2 = 0
+        pos1 = random.randint(0, FLOWERS_NUMBER - 2)
+        pos2 = random.randint(0, FLOWERS_NUMBER - 2)
         while pos2 == pos1:
-            pos2 = random.randint(0, FLOWERS_NUMBER - 1)
+            pos2 = random.randint(0, FLOWERS_NUMBER - 2)
         path = individual.getOrder()
         first = path[pos1]
         second = path[pos2]
@@ -185,11 +185,11 @@ if len(data) == 0:
 flowersList = initFlowersList(data)
 
 last_generation = cycle(flowersList)
-best_path = last_generation[0]  # or is it ?
-printPopulation(last_generation, GENERATION_COUNT_MAX)
+best_path = last_generation[0]
 print("\nBEST PATH OF LAST GENERATION : ")
-best_path.printPath()
+best_path.printFitness()
 print("LENGTH", len(last_generation))
+
 """
 New AG : 
 FIRST GENERATION : start with POPULATION_COUNT = 100 random paths
