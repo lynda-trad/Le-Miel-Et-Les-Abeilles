@@ -40,7 +40,7 @@ def drawNodes(flowersList, graph):
         index = flower.getIndex()
         coordinates = flower.getCoordinates()
         graph.add_node(index, pos=coordinates)
-    graph.add_node(0, pos=(500, 500))  # beehive start
+    graph.add_node(50, pos=(500, 500))  # beehive start
     nodePos = nx.get_node_attributes(graph, 'pos')
     # Draws nodes
     for flower in flowersList:
@@ -56,7 +56,7 @@ def drawNodes(flowersList, graph):
             nx.draw_networkx_nodes(graph, nodePos, nodelist=[index], node_color="#C90076", node_shape="X")
         else:
             nx.draw_networkx_nodes(graph, nodePos, nodelist=[index], node_color="#00f6ff", node_shape="X")
-    nx.draw_networkx_nodes(graph, nodePos, nodelist=[0], node_color="#27a906", node_shape="s")  # Draws beehive
+    nx.draw_networkx_nodes(graph, nodePos, nodelist=[50], node_color="#27a906", node_shape="s")  # Draws beehive
     return nodePos
 
 

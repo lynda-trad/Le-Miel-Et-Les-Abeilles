@@ -76,7 +76,7 @@ def crossing(first_half, last_half, half, flowList):
     indexList = []
     for flower in cross.getOrder():
         indexList.append(flower.getIndex())
-    for i in range(49):
+    for i in range(50):
         if i not in indexList:
             missingFlower = getFlowerById(flowList, i)
             cross.addFlower(missingFlower)
@@ -189,17 +189,16 @@ def cycle(fList, graph, nodePos, flowList):
     previousGen = firstPopulation
     newGeneration = []
     averageList.append(calculateAverage(previousGen))
-    # graphPrinting.printGraph(graph, nodePos, fList, 1, previousGen[0])
+    graphPrinting.printGraph(graph, nodePos, fList, 1, previousGen[0])
 
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
         newGeneration = generateNewGeneration(previousGen, flowList)
+        # Calculates average length of generation's bees
         averageList.append(calculateAverage(newGeneration))
-        """
         # Printing best bee of this generation
         bestBee = newGeneration[0]
         graphPrinting.printGraph(graph, nodePos, fList, i, bestBee)
-        """
         if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
             newGeneration = []
@@ -232,7 +231,21 @@ flowersList = initFlowersList(data)
 # NetworkX Graph init
 G, pos = graphPrinting.initPrintingGraph(flowersList)
 
-print("-- GENERATIONS --\nBe patient !")
+print("-- GENERATIONS --\nPlease be patient !")
+print('''
+              \     /
+          \    o ^ o    /
+            \ (     ) /
+ ____________(%%%%%%%)____________
+(     /   /  )%%%%%%%(  \   \     )
+(___/___/__/           \__\___\___)
+   (     /  /(%%%%%%%)\  \     )
+    (__/___/ (%%%%%%%) \___\__)
+            /(       )\\
+          /   (%%%%%)   \\
+               (%%%)
+                 !
+''')
 last_generation, averageL = cycle(flowersList, G, pos, flowersList)
 best_path = last_generation[0]
 printPopulation(last_generation, GENERATION_COUNT_MAX)
