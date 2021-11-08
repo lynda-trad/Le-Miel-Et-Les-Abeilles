@@ -2,14 +2,26 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
+# Prints average length of a generation
+def printAverageGraph(averageList):
+    figure = plt.gcf()
+    plt.plot(averageList)
+    plt.ylabel('Length')
+    plt.savefig("./generations/average.png", bbox_inches='tight')
+    plt.tight_layout()
+    figure.clear()
+    plt.clf()
+
+
 # Inits Graph with Networkx
 def initPrintingGraph(flowersList):
     graph = nx.Graph()
     nodePos = drawNodes(flowersList, graph)
     # drawCoordinates(flowersList, nodePos)
-    plt.savefig("./flowerfield.png")
+    plt.savefig("./generations/flowerfield.png")
     plt.tight_layout()
     plt.axis("off")
+    plt.clf()
     return graph, nodePos
 
 
@@ -51,21 +63,22 @@ def drawNodes(flowersList, graph):
 # Adds edges = bee path to graph and draws them
 def drawEdges(nodePos, graph, bee):
     # Adds edges
-    for i in range(len(bee) - 2):
-        first_flower = bee[i].getIndex()
-        second_flower = bee[i + 1].getIndex()
+    path = bee.getOrder()
+    for i in range(len(path) - 2):
+        first_flower = path[i].getIndex()
+        second_flower = path[i + 1].getIndex()
         graph.add_edge(first_flower, second_flower)
     # Draws edges
-    nx.draw_networkx_edges(graph, nodePos, width=1.0, alpha=0.5)
+    nx.draw_networkx_edges(graph, nodePos, style="solid", width=2.0, label="S", arrowstyle='->')
 
 
 # Prints NetworkX Graph
 def printGraph(graph, nodePos, flowersList, generationId, bee):
     figure = plt.gcf()
-    figure.canvas.manager.set_window_title('Anthill')
+    figure.canvas.manager.set_window_title('Flowerfield')
     figure.canvas.manager.window.SetPosition = (200, 200)
-    drawNodes(flowersList, nodePos, graph)
-    drawCoordinates(flowersList, nodePos)
+    drawNodes(flowersList, graph)
+    # drawCoordinates(flowersList, nodePos)
     drawEdges(nodePos, graph, bee)
     plt.savefig("./generations/gen" + str(generationId) + ".png")
     plt.tight_layout()

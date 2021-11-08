@@ -22,7 +22,7 @@ def openFile():
 # Returns flower list by parsing dataframe
 def initFlowersList(d):
     fList = []
-    i = 1
+    i = 0
     for line in range(len(d)):
         f = Flower.Flower(d.loc[line, 'x'], d.loc[line, 'y'], i)
         fList.append(f)
@@ -86,7 +86,6 @@ def crossover(population, bestL):
                 fList = list(set(orders[i] + orders[j]))
                 cross.setOrder(fList)
                 population.append(cross)
-                cross.printPath()
                 # population.append(crossing(orders[i], orders[j], half))
     return population
 
@@ -161,27 +160,44 @@ def generateNewGeneration(previous):
 
 
 # Generates GENERATION_COUNT_MAX generations and returns the last one
-def cycle(fList):
+def cycle(fList, graph, nodePos):
+    averageList = []
     # First generation
     firstPopulation = generateFirstGeneration(fList)
     previousGen = firstPopulation
     newGeneration = []
-    # printPopulation(previousGen, 1)
+    averageList.append(calculateAverage(previousGen))
+    # graphPrinting.printGraph(graph, nodePos, fList, 1, previousGen[0])
 
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
         newGeneration = generateNewGeneration(previousGen)
-        # printPopulation(newGeneration, i)
+        averageList.append(calculateAverage(newGeneration))
+        """
+        # Printing best bee of this generation
+        bestBee = newGeneration[0]
+        graphPrinting.printGraph(graph, nodePos, fList, i, bestBee)
+        """
         if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
             newGeneration = []
-    return newGeneration  # last generation
+    return newGeneration, averageList  # last gen
 
 
+# Prints fitness of each individual of a population
 def printPopulation(population, i):
     print("\nGeneration", i)
     for individual in population:
         individual.printFitness()
+
+
+# Calculates average path length of a population
+def calculateAverage(population):
+    total = 0
+    for individual in population:
+        total += individual.getLength()
+    average = total / POPULATION_COUNT
+    return average
 
 
 ##################################################
@@ -193,17 +209,19 @@ flowersList = initFlowersList(data)
 
 # NetworkX Graph init
 G, pos = graphPrinting.initPrintingGraph(flowersList)
-"""
+
 print("-- GENERATIONS --\nBe patient !")
-last_generation = cycle(flowersList)
+last_generation, averageL = cycle(flowersList, G, pos)
 best_path = last_generation[0]
 printPopulation(last_generation, GENERATION_COUNT_MAX)
 print("\nBEST PATH OF LAST GENERATION : ")
 best_path.printPath()
 print("LENGTH", len(last_generation))
-"""
+
+# Generates graph showing averageL of each generation compared to the others
+graphPrinting.printAverageGraph(averageL)
+
 """
 20 mere 10 mere 20 pere
-20 pere 
-
+20 pere 10 pere 20 mere
 """
