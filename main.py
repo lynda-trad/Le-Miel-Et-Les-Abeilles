@@ -5,7 +5,7 @@ import Path
 import graphPrinting
 
 POPULATION_COUNT = 100
-GENERATION_COUNT_MAX = 500
+GENERATION_COUNT_MAX = 200
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 
@@ -63,6 +63,35 @@ def sortPopulation(fitnesses, population):
     return population
 
 
+# Removes duplicates from genome
+def removeDuplicate(cross):
+    indexList = []
+    order = cross.getOrder()
+    for i in range(FLOWERS_NUMBER - 1):
+        count = 0
+        for j in range(len(order)):
+            flower = order[j]
+            if flower.getIndex() == i:
+                count += 1
+                if count > 1:
+                    indexList.append(j)
+    indexList.sort(reverse=True)
+    for j in indexList:
+        order.pop(j)
+    return cross
+
+
+# Adds missing flowers
+def addMissingFlowers(cross, flowList):
+    indexList = []
+    for flower in cross.getOrder():
+        indexList.append(flower.getIndex())
+    for i in range(FLOWERS_NUMBER):
+        if i not in indexList:
+            missingFlower = getFlowerById(flowList, i)
+            cross.addFlower(missingFlower)
+
+
 # Crosses first half and last half of two genomes ; returns new genome
 def crossing(first_half, last_half, half, flowList):
     cross = Path.Path()
@@ -70,20 +99,13 @@ def crossing(first_half, last_half, half, flowList):
         cross.addFlower(first_half[i])
     for i in range(half, FLOWERS_NUMBER - 1):
         cross.addFlower(last_half[i])
-    # Removes duplicates
-    cross.setOrder(list(dict.fromkeys(cross.getOrder())))
-    # Adds missing flowers
-    indexList = []
-    for flower in cross.getOrder():
-        indexList.append(flower.getIndex())
-    for i in range(50):
-        if i not in indexList:
-            missingFlower = getFlowerById(flowList, i)
-            cross.addFlower(missingFlower)
+    removeDuplicate(cross)
+    addMissingFlowers(cross, flowList)
     cross.calculateLength()
     return cross
 
 
+# Creates 2 children with gen's best bees couples
 def crossover(population, bestL, flowList):
     half = int(FLOWERS_NUMBER / 2) - 1
     orders = []
@@ -91,42 +113,31 @@ def crossover(population, bestL, flowList):
         orders.append(best.getOrder())
     for i in range(len(bestL) - 3):
         population.append(crossing(orders[i], orders[i + 2], half, flowList))
+        population.append(crossing(orders[i + 2], orders[i], half, flowList))
     return population
-
-
-"""
-def crossover(population, bestL):
-    half = int(FLOWERS_NUMBER / 2) - 1
-    orders = []
-    for best in bestL:
-        orders.append(best.getOrder())
-    for i in range(len(bestL) - 1):
-        for j in range(len(bestL) - 1):  # each best will reproduce with another best twice
-            if i != j:
-                cross = Path.Path()
-                fList = list(set(orders[i] + orders[j]))
-                cross.setOrder(fList)
-                population.append(cross)
-                # population.append(crossing(orders[i], orders[j], half))
-    return population
-"""
 
 
 # 2 flowers switch places in every path of the population
 def mutation(population):
     for i in range(20, POPULATION_COUNT - 2):
-        individual = population[i]
-        pos1 = random.randint(0, FLOWERS_NUMBER - 2)
-        pos2 = random.randint(0, FLOWERS_NUMBER - 2)
-        while pos2 == pos1:
+        chance = random.randint(0, 5)
+        if chance % 2 == 0:
+            individual = population[i]
+            pos1 = random.randint(0, FLOWERS_NUMBER - 2)
             pos2 = random.randint(0, FLOWERS_NUMBER - 2)
-        path = individual.getOrder()
-        first_flower = path[pos1]
-        second_flower = path[pos2]
-        path.pop(pos1)
-        path.pop(pos2)
-        path.insert(pos1, second_flower)
-        path.insert(pos2, first_flower)
+            while pos2 == pos1:
+                pos2 = random.randint(0, FLOWERS_NUMBER - 2)
+            path = individual.getOrder()
+            first_flower = path[pos1]
+            second_flower = path[pos2]
+            if pos2 > pos1:
+                path.pop(pos2)
+                path.pop(pos1)
+            else:
+                path.pop(pos1)
+                path.pop(pos2)
+            path.insert(pos1, second_flower)
+            path.insert(pos2, first_flower)
     return population
 
 
@@ -162,13 +173,16 @@ def generateFirstGeneration(fList):
 
 
 # Generates a new generation with previous one
-def generateNewGeneration(previous, flowList):
+def generateNewGeneration(previous, flowList, previousAverage):
     new = previous
     bestList = []
     for i in range(20):
         bestList.append(new[i])
 
-    new = mutation(new)  # 6 ) last 80 members will be mutated
+    # Checks if mutations are necessary
+    if abs(previousAverage - calculateAverage(new)) <= 500:
+        new = mutation(new)
+    # new = mutation(new)  # 6 ) last 80 members will be mutated
     new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
 
     # Sorting population
@@ -193,7 +207,10 @@ def cycle(fList, graph, nodePos, flowList):
 
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
-        newGeneration = generateNewGeneration(previousGen, flowList)
+        previousAverage = 0
+        if len(averageList) >= 2:
+            previousAverage = averageList[-1]
+        newGeneration = generateNewGeneration(previousGen, flowList, previousAverage)
         # Calculates average length of generation's bees
         averageList.append(calculateAverage(newGeneration))
         # Printing best bee of this generation
@@ -231,7 +248,7 @@ flowersList = initFlowersList(data)
 # NetworkX Graph init
 G, pos = graphPrinting.initPrintingGraph(flowersList)
 
-print("-- GENERATIONS --\nPlease be patient !")
+print("-- GENERATING --\nPlease bee patient !")
 print('''
               \     /
           \    o ^ o    /

@@ -11,4 +11,4 @@ class Flower:
         return self.index
 
     def printFlower(self):
-        print("\nFlower", self.index, ": (", self.x, ",", self.y, ")")
+        print("Flower", self.index, ": (", self.x, ",", self.y, ")")
