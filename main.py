@@ -2,6 +2,7 @@ import pandas as pd
 import random
 import Flower
 import Path
+import graphPrinting
 
 POPULATION_COUNT = 100
 GENERATION_COUNT_MAX = 500
@@ -21,7 +22,7 @@ def openFile():
 # Returns flower list by parsing dataframe
 def initFlowersList(d):
     fList = []
-    i = 0
+    i = 1
     for line in range(len(d)):
         f = Flower.Flower(d.loc[line, 'x'], d.loc[line, 'y'], i)
         fList.append(f)
@@ -189,6 +190,10 @@ if len(data) == 0:
     print("File is empty or does not exist, please place flowers.xlsx in resources directory.")
     quit()
 flowersList = initFlowersList(data)
+
+# NetworkX Graph init
+G, pos = graphPrinting.initPrintingGraph(flowersList)
+"""
 print("-- GENERATIONS --\nBe patient !")
 last_generation = cycle(flowersList)
 best_path = last_generation[0]
@@ -196,3 +201,9 @@ printPopulation(last_generation, GENERATION_COUNT_MAX)
 print("\nBEST PATH OF LAST GENERATION : ")
 best_path.printPath()
 print("LENGTH", len(last_generation))
+"""
+"""
+20 mere 10 mere 20 pere
+20 pere 
+
+"""
