@@ -5,7 +5,7 @@ import Path
 import graphPrinting
 
 POPULATION_COUNT = 100
-GENERATION_COUNT_MAX = 200
+GENERATION_COUNT_MAX = 500
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 
@@ -67,7 +67,8 @@ def sortPopulation(fitnesses, population):
 def removeDuplicate(cross):
     indexList = []
     order = cross.getOrder()
-    for i in range(FLOWERS_NUMBER - 1):
+    # print(" BEFORE REMOVING DUPLICATES :\n", cross.printIndex())
+    for i in range(FLOWERS_NUMBER):
         count = 0
         for j in range(len(order)):
             flower = order[j]
@@ -78,6 +79,7 @@ def removeDuplicate(cross):
     indexList.sort(reverse=True)
     for j in indexList:
         order.pop(j)
+    # print(" AFTER REMOVING DUPLICATES :\n", cross.printIndex())
     return cross
 
 
@@ -85,11 +87,15 @@ def removeDuplicate(cross):
 def addMissingFlowers(cross, flowList):
     indexList = []
     for flower in cross.getOrder():
-        indexList.append(flower.getIndex())
+        index = flower.getIndex()
+        indexList.append(index)
     for i in range(FLOWERS_NUMBER):
         if i not in indexList:
             missingFlower = getFlowerById(flowList, i)
+            # print("Flower missing : ", missingFlower.getIndex())
             cross.addFlower(missingFlower)
+    # print("cross indexlist", cross.printIndex())
+    # print("cross index length", len(cross.printIndex()))
 
 
 # Crosses first half and last half of two genomes ; returns new genome

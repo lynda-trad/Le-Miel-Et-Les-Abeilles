@@ -49,3 +49,11 @@ class Path:
             if i != len(self.order) - 1:
                 total += distanceCalculus(self.order[i].getCoordinates(), self.order[i + 1].getCoordinates())
         self.length = total
+
+    def printIndex(self):
+        indexList = []
+        order = self.getOrder()
+        for flower in order:
+            index = flower.getIndex()
+            indexList.append(index)
+        return indexList

@@ -8,18 +8,6 @@ def printAverageGraph(averageList):
     plt.plot(averageList)
     plt.ylabel('Length')
     label = str(averageList[-1])
-    """
-    x = averageList[-1]
-    y = len(averageList) - 1
-    plt.annotate(label,  # this is the text
-                 (x, y),  # these are the coordinates to position the label
-                 textcoords="offset points",  # how to position the text
-                 xytext=(-20, 20),  # distance from text to points (x,y)
-                 ha='center',
-                 bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-                 arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0')
-                 )  # horizontal alignment can be left, right or center
-    """
     plt.title('Last generation\'s average : ' + label)
     plt.savefig("./generations/average.png", bbox_inches='tight')
     plt.tight_layout()
@@ -31,7 +19,6 @@ def printAverageGraph(averageList):
 def initPrintingGraph(flowersList):
     graph = nx.DiGraph(directed=True)
     nodePos = drawNodes(flowersList, graph)
-    # drawCoordinates(flowersList, nodePos)
     plt.savefig("./generations/flowerfield.png")
     plt.tight_layout()
     plt.axis("off")
@@ -97,6 +84,6 @@ def printGraph(graph, nodePos, flowersList, generationId, bee):
     plt.tight_layout()
     plt.axis("off")
     plt.draw()
-    plt.pause(0.1)
+    plt.pause(0.05)
     plt.clf()
     graph.remove_edges_from(list(graph.edges()))
