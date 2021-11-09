@@ -53,7 +53,7 @@ def drawNodes(flowersList, graph):
     for flower in flowersList:
         index = flower.getIndex()
         color = chooseColor(flower.getIndex())
-        nx.draw_networkx_nodes(graph, nodePos, nodelist=[index], node_color=color, node_shape=".")
+        nx.draw_networkx_nodes(graph, nodePos, node_size=100, nodelist=[index], node_color=color, node_shape="X")
     nx.draw_networkx_nodes(graph, nodePos, nodelist=[50], node_color="#27a906", node_shape="s")  # Draws beehive
     return nodePos
 
