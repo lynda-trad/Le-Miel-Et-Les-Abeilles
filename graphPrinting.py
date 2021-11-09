@@ -53,7 +53,7 @@ def drawNodes(flowersList, graph):
     for flower in flowersList:
         index = flower.getIndex()
         color = chooseColor(flower.getIndex())
-        nx.draw_networkx_nodes(graph, nodePos, nodelist=[index], node_color=color, node_shape="X")
+        nx.draw_networkx_nodes(graph, nodePos, nodelist=[index], node_color=color, node_shape=".")
     nx.draw_networkx_nodes(graph, nodePos, nodelist=[50], node_color="#27a906", node_shape="s")  # Draws beehive
     return nodePos
 
@@ -63,7 +63,7 @@ def drawEdges(nodePos, graph, bee):
     path = bee.getOrder()
     # Adds edge between first flower and beehive
     graph.add_edge(50, path[0].getIndex())
-    for i in range(len(path) - 2):
+    for i in range(len(path) - 1):
         first_flower = path[i].getIndex()
         second_flower = path[i + 1].getIndex()
         graph.add_edge(first_flower, second_flower)

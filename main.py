@@ -67,7 +67,6 @@ def sortPopulation(fitnesses, population):
 def removeDuplicate(cross):
     indexList = []
     order = cross.getOrder()
-    # print(" BEFORE REMOVING DUPLICATES :\n", cross.printIndex())
     for i in range(FLOWERS_NUMBER):
         count = 0
         for j in range(len(order)):
@@ -79,7 +78,6 @@ def removeDuplicate(cross):
     indexList.sort(reverse=True)
     for j in indexList:
         order.pop(j)
-    # print(" AFTER REMOVING DUPLICATES :\n", cross.printIndex())
     return cross
 
 
@@ -92,10 +90,7 @@ def addMissingFlowers(cross, flowList):
     for i in range(FLOWERS_NUMBER):
         if i not in indexList:
             missingFlower = getFlowerById(flowList, i)
-            # print("Flower missing : ", missingFlower.getIndex())
             cross.addFlower(missingFlower)
-    # print("cross indexlist", cross.printIndex())
-    # print("cross index length", len(cross.printIndex()))
 
 
 # Crosses first half and last half of two genomes ; returns new genome
