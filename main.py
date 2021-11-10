@@ -5,9 +5,10 @@ import Path
 import graphPrinting
 
 POPULATION_COUNT = 100
-GENERATION_COUNT_MAX = 500
+GENERATION_COUNT_MAX = 300
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
+MUTATION_RATE = 0.05
 
 
 # Opens excel file and returns dataframe
@@ -120,9 +121,9 @@ def crossover(population, bestL, flowList):
 
 # 2 flowers switch places in every path of the population
 def mutation(population):
-    for i in range(20, POPULATION_COUNT - 2):
-        chance = random.randint(0, 5)
-        if chance % 2 == 0:
+    for i in range(POPULATION_COUNT - 2):
+        chance = random.uniform(0, 1)
+        if chance > MUTATION_RATE:
             individual = population[i]
             pos1 = random.randint(0, FLOWERS_NUMBER - 2)
             pos2 = random.randint(0, FLOWERS_NUMBER - 2)
@@ -180,10 +181,7 @@ def generateNewGeneration(previous, flowList, previousAverage):
     for i in range(20):
         bestList.append(new[i])
 
-    # Checks if mutations are necessary
-    if abs(previousAverage - calculateAverage(new)) <= 500:
-        new = mutation(new)
-    # new = mutation(new)  # 6 ) last 80 members will be mutated
+    new = mutation(new)  # 6 ) last 80 members will be mutated
     new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
 
     # Sorting population
