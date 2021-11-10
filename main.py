@@ -40,13 +40,13 @@ def getFlowerById(flowList, index):
 
 # Returns list of individuals' fitness in a population
 def fitness(population):
-    fitnesses = {}
+    fitList = {}
     i = 0
     for individual in population:
-        individual.calculateLength()
-        fitnesses[i] = individual.getLength()
+        individual.calculateFitness()
+        fitList[i] = individual.getLength()
         i += 1
-    return fitnesses
+    return fitList
 
 
 # Sorts fitness list by shortest
@@ -56,9 +56,11 @@ def sortFitnesses(fitnesses):
 
 
 # Sorts population by shortest fitness
-def sortPopulation(fitnesses, population):
+def sortPopulation(population):
+    fitDic = fitness(population)
+    fitDic = sortFitnesses(fitDic)
     sortedPopulation = []
-    for key in fitnesses.keys():
+    for key in fitDic.keys():
         sortedPopulation.append(population[int(key)])
     population = sortedPopulation
     return population
@@ -103,7 +105,7 @@ def crossing(first_half, last_half, half, flowList):
         cross.addFlower(last_half[i])
     removeDuplicate(cross)
     addMissingFlowers(cross, flowList)
-    cross.calculateLength()
+    cross.calculateFitness()
     return cross
 
 
@@ -121,26 +123,23 @@ def crossover(population, bestL, flowList):
 
 # 2 flowers switch places in every path of the population
 def mutation(population):
-    for i in range(20, len(population) - 1):
-        print("MUTATION:", i)
-        chance = random.uniform(0, 1)
-        if chance > MUTATION_RATE:
-            individual = population[i]
-            pos1 = random.randint(0, FLOWERS_NUMBER - 2)
+    for i in range(20, POPULATION_COUNT - 2):
+        individual = population[i]
+        pos1 = random.randint(0, FLOWERS_NUMBER - 2)
+        pos2 = random.randint(0, FLOWERS_NUMBER - 2)
+        while pos2 == pos1:
             pos2 = random.randint(0, FLOWERS_NUMBER - 2)
-            while pos2 == pos1:
-                pos2 = random.randint(0, FLOWERS_NUMBER - 2)
-            path = individual.getOrder()
-            first_flower = path[pos1]
-            second_flower = path[pos2]
-            if pos2 > pos1:
-                path.pop(pos2)
-                path.pop(pos1)
-            else:
-                path.pop(pos1)
-                path.pop(pos2)
-            path.insert(pos1, second_flower)
-            path.insert(pos2, first_flower)
+        path = individual.getOrder()
+        first_flower = path[pos1]
+        second_flower = path[pos2]
+        if pos2 > pos1:
+            path.pop(pos2)
+            path.pop(pos1)
+        else:
+            path.pop(pos1)
+            path.pop(pos2)
+        path.insert(pos1, second_flower)
+        path.insert(pos2, first_flower)
     return population
 
 
@@ -160,7 +159,7 @@ def generatePopulation(population, flowList, count):
         indexList = random.sample(range(len(flowList)), len(flowList))
         for index in indexList:
             individual.addFlower(getFlowerById(flowList, index))
-        individual.calculateLength()
+        individual.calculateFitness()
         population.append(individual)
     return population
 
@@ -169,38 +168,21 @@ def generatePopulation(population, flowList, count):
 def generateFirstGeneration(fList):
     first = []
     first = generatePopulation(first, fList, POPULATION_COUNT - len(first))
-    fitnessDic = fitness(first)
-    fitnessDic = sortFitnesses(fitnessDic)
-    first = sortPopulation(fitnessDic, first)
+    first = sortPopulation(first)
     return first
 
 
 # Generates a new generation with previous one
 def generateNewGeneration(previous, flowList, previousAverage):
     new = previous
+    new = sortPopulation(new)
     bestList = []
     for i in range(20):
         bestList.append(new[i])
-
-    """
-    new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
     if abs(previousAverage - calculateAverage(new)) <= 500:
         new = mutation(new)
-    """
-
-    if abs(previousAverage - calculateAverage(new)) <= 500:
-        new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
-        new = mutation(new)
-    else:
-        new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
-    
-
-    # Sorting population
-    new_fitnessDic = fitness(new)  # 2 )
-    new_fitnessDic = sortFitnesses(new_fitnessDic)
-    new = sortPopulation(new_fitnessDic, new)
-
-    # Removing excess worst individuals
+    new = crossover(new, bestList, flowList)
+    new = sortPopulation(new)
     new = removingWorst(new)
     return new
 
@@ -208,6 +190,7 @@ def generateNewGeneration(previous, flowList, previousAverage):
 # Generates GENERATION_COUNT_MAX generations and returns the last one
 def cycle(fList, graph, nodePos, flowList):
     averageList = []
+    bestBees = []
     # First generation
     firstPopulation = generateFirstGeneration(fList)
     previousGen = firstPopulation
@@ -222,14 +205,17 @@ def cycle(fList, graph, nodePos, flowList):
             previousAverage = averageList[-1]
         newGeneration = generateNewGeneration(previousGen, flowList, previousAverage)
         averageList.append(calculateAverage(newGeneration))
+        bestBees.append(newGeneration[0].getLength())
         """
         bestBee = newGeneration[0]
         graphPrinting.printGraph(graph, nodePos, fList, i, bestBee)
         """
+        if i % 500 == 0:
+            print("GENERATION", i, "REACHED\n")
         if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
             newGeneration = []
-    return newGeneration, averageList  # last gen
+    return newGeneration, averageList, bestBees  # last gen
 
 
 # Prints fitness of each individual of a population
@@ -273,7 +259,7 @@ print('''
                (%%%)
                  !
 ''')
-last_generation, averageL = cycle(flowersList, G, pos, flowersList)
+last_generation, averageL, bestBees = cycle(flowersList, G, pos, flowersList)
 best_path = last_generation[0]
 printPopulation(last_generation, GENERATION_COUNT_MAX)
 print("\nBEST PATH OF LAST GENERATION : ")
@@ -281,4 +267,5 @@ best_path.printPath()
 print("LENGTH", len(last_generation))
 # Generates graph showing averageL of each generation compared to the others
 best = best_path.getLength()
-graphPrinting.printAverageGraph(averageL, str(best))
+graphPrinting.printEvolutionGraph(averageL, str(best), 'average')
+graphPrinting.printEvolutionGraph(bestBees, str(bestBees[-1]), 'bestBees')

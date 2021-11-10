@@ -40,7 +40,7 @@ class Path:
         print("Fitness : ", self.getLength())
 
     # Calculates fitness
-    def calculateLength(self):
+    def calculateFitness(self):
         total = 0
         starting_point = (500, 500)
         if len(self.order) != 0:
