@@ -5,7 +5,7 @@ import Path
 import graphPrinting
 
 POPULATION_COUNT = 100
-GENERATION_COUNT_MAX = 300
+GENERATION_COUNT_MAX = 2000
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 MUTATION_RATE = 0.05
@@ -121,7 +121,8 @@ def crossover(population, bestL, flowList):
 
 # 2 flowers switch places in every path of the population
 def mutation(population):
-    for i in range(POPULATION_COUNT - 2):
+    for i in range(20, len(population) - 1):
+        print("MUTATION:", i)
         chance = random.uniform(0, 1)
         if chance > MUTATION_RATE:
             individual = population[i]
@@ -181,8 +182,18 @@ def generateNewGeneration(previous, flowList, previousAverage):
     for i in range(20):
         bestList.append(new[i])
 
-    new = mutation(new)  # 6 ) last 80 members will be mutated
+    """
     new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
+    if abs(previousAverage - calculateAverage(new)) <= 500:
+        new = mutation(new)
+    """
+
+    if abs(previousAverage - calculateAverage(new)) <= 500:
+        new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
+        new = mutation(new)
+    else:
+        new = crossover(new, bestList, flowList)  # 4 ) 400 children are generated
+    
 
     # Sorting population
     new_fitnessDic = fitness(new)  # 2 )
@@ -202,7 +213,7 @@ def cycle(fList, graph, nodePos, flowList):
     previousGen = firstPopulation
     newGeneration = []
     averageList.append(calculateAverage(previousGen))
-    graphPrinting.printGraph(graph, nodePos, fList, 1, previousGen[0])
+    # graphPrinting.printGraph(graph, nodePos, fList, 1, previousGen[0])
 
     # New generation
     for i in range(2, GENERATION_COUNT_MAX + 1):
@@ -210,11 +221,11 @@ def cycle(fList, graph, nodePos, flowList):
         if len(averageList) >= 2:
             previousAverage = averageList[-1]
         newGeneration = generateNewGeneration(previousGen, flowList, previousAverage)
-        # Calculates average length of generation's bees
         averageList.append(calculateAverage(newGeneration))
-        # Printing best bee of this generation
+        """
         bestBee = newGeneration[0]
         graphPrinting.printGraph(graph, nodePos, fList, i, bestBee)
+        """
         if i != GENERATION_COUNT_MAX:
             previousGen = newGeneration
             newGeneration = []
@@ -268,6 +279,6 @@ printPopulation(last_generation, GENERATION_COUNT_MAX)
 print("\nBEST PATH OF LAST GENERATION : ")
 best_path.printPath()
 print("LENGTH", len(last_generation))
-
 # Generates graph showing averageL of each generation compared to the others
-graphPrinting.printAverageGraph(averageL)
+best = best_path.getLength()
+graphPrinting.printAverageGraph(averageL, str(best))

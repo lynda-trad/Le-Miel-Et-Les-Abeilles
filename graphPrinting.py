@@ -3,12 +3,11 @@ import matplotlib.pyplot as plt
 
 
 # Prints average length of a generation
-def printAverageGraph(averageList):
+def printAverageGraph(averageList, best):
     figure = plt.gcf()
     plt.plot(averageList)
     plt.ylabel('Length')
-    label = str(averageList[-1])
-    plt.title('Last generation\'s average : ' + label)
+    plt.title('Last generation\'s best bee : ' + best)
     plt.savefig("./generations/average.png", bbox_inches='tight')
     plt.tight_layout()
     figure.clear()
