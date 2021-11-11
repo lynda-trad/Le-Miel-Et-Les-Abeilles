@@ -6,8 +6,13 @@ import matplotlib.pyplot as plt
 def printEvolutionGraph(averageList, best, filename):
     figure = plt.gcf()
     plt.plot(averageList)
+    plt.xlabel('Generations')
     plt.ylabel('Length')
-    plt.title(filename + ' -- Last generation\'s best bee : ' + best)
+    if filename == 'bees':
+        label = 'best bee length'
+    else:
+        label = 'generation\'s average length'
+    plt.title('Last ' + label + ': ' + best)
     plt.savefig('./generations/' + filename + '.png', bbox_inches='tight')
     plt.tight_layout()
     figure.clear()
