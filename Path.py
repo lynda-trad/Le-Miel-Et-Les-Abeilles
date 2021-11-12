@@ -13,37 +13,37 @@ def distanceCalculus(coord1, coord2):
 
 class Path:
     def __init__(self):
-        self._order = []
-        self._length = 0
+        self.__order = []
+        self.__length = 0
 
     def getLength(self):
-        return self._length
+        return self.__length
 
     def getOrder(self):
-        return self._order
+        return self.__order
 
     def setOrder(self, fList):
-        self._order = fList
+        self.__order = fList
 
     # Adds flower object to order list
     def addFlower(self, flower):
-        self._order.append(flower)
+        self.__order.append(flower)
 
     # Calculates fitness
     def calculateFitness(self):
         total = 0
         starting_point = (500, 500)
-        if len(self._order) != 0:
-            total += distanceCalculus(starting_point, self._order[0].getCoordinates())
-        for i in range(len(self._order)):
-            if i != len(self._order) - 1:
-                total += distanceCalculus(self._order[i].getCoordinates(), self._order[i + 1].getCoordinates())
-        self._length = total
+        if len(self.__order) != 0:
+            total += distanceCalculus(starting_point, self.__order[0].getCoordinates())
+        for i in range(len(self.__order)):
+            if i != len(self.__order) - 1:
+                total += distanceCalculus(self.__order[i].getCoordinates(), self.__order[i + 1].getCoordinates())
+        self.__length = total
 
     # Printing methods
     def printPath(self):
         print("\nPath:")
-        for flower in self._order:
+        for flower in self.__order:
             flower.printFlower()
         self.printFitness()
 
@@ -52,7 +52,7 @@ class Path:
 
     def printIndex(self):
         indexList = []
-        for flower in self._order:
+        for flower in self.__order:
             index = flower.getIndex()
             indexList.append(index)
         return indexList
