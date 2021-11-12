@@ -1,14 +1,14 @@
 class Flower:
     def __init__(self, x, y, index):
-        self.x = x
-        self.y = y
-        self.index = index
+        self._x = x
+        self._y = y
+        self._index = index
 
     def getCoordinates(self):
-        return self.x, self.y
+        return self._x, self._y
 
     def getIndex(self):
-        return self.index
+        return self._index
 
     def printFlower(self):
         print("Flower", self.index, ": (", self.x, ",", self.y, ")")

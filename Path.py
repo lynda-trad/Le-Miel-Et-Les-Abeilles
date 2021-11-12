@@ -13,47 +13,46 @@ def distanceCalculus(coord1, coord2):
 
 class Path:
     def __init__(self):
-        self.order = []
-        self.length = 0
+        self._order = []
+        self._length = 0
 
     def getLength(self):
-        return self.length
+        return self._length
 
     def getOrder(self):
-        return self.order
+        return self._order
 
     def setOrder(self, fList):
-        self.order = fList
+        self._order = fList
 
     # Adds flower object to order list
     def addFlower(self, flower):
-        self.order.append(flower)
+        self._order.append(flower)
+
+    # Calculates fitness
+    def calculateFitness(self):
+        total = 0
+        starting_point = (500, 500)
+        if len(self._order) != 0:
+            total += distanceCalculus(starting_point, self._order[0].getCoordinates())
+        for i in range(len(self._order)):
+            if i != len(self._order) - 1:
+                total += distanceCalculus(self._order[i].getCoordinates(), self._order[i + 1].getCoordinates())
+        self._length = total
 
     # Printing methods
     def printPath(self):
         print("\nPath:")
-        for flower in self.order:
+        for flower in self._order:
             flower.printFlower()
         self.printFitness()
 
     def printFitness(self):
         print("Fitness : ", self.getLength())
 
-    # Calculates fitness
-    def calculateFitness(self):
-        total = 0
-        starting_point = (500, 500)
-        if len(self.order) != 0:
-            total += distanceCalculus(starting_point, self.order[0].getCoordinates())
-        for i in range(len(self.order)):
-            if i != len(self.order) - 1:
-                total += distanceCalculus(self.order[i].getCoordinates(), self.order[i + 1].getCoordinates())
-        self.length = total
-
     def printIndex(self):
         indexList = []
-        order = self.getOrder()
-        for flower in order:
+        for flower in self._order:
             index = flower.getIndex()
             indexList.append(index)
         return indexList

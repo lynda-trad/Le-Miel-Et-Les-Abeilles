@@ -5,7 +5,7 @@ import Path
 import graphPrinting
 
 POPULATION_COUNT = 100
-GENERATION_COUNT_MAX = 2000
+GENERATION_COUNT_MAX = 50
 STARTING_POS = (500, 500)
 FLOWERS_NUMBER = 50
 MUTATION_RATE = 0.05
@@ -81,6 +81,7 @@ def removeDuplicate(cross):
     indexList.sort(reverse=True)
     for j in indexList:
         order.pop(j)
+    cross.setOrder(order)
     return cross
 
 
@@ -137,6 +138,7 @@ def flowersSwitch(individual):
         path.pop(pos2)
     path.insert(pos1, second_flower)
     path.insert(pos2, first_flower)
+    individual.setOrder(path)
     return individual
 
 
@@ -145,7 +147,6 @@ def mutation(population):
     for i in range(20, POPULATION_COUNT - 2):
         individual = population[i]
         population[i] = flowersSwitch(individual)
-
     return population
 
 
